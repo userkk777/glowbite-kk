@@ -1,158 +1,11 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-<meta charset="UTF-8">
-<title>GlowBite</title>
-
-<style>
-body {
-    font-family: Arial;
-    margin: 0;
-    background: #f5f5f5;
-}
-
-header {
-    background: linear-gradient(90deg, #ff8c00, #ff3c6f);
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-
-.logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
-
-.products {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.product {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-
-input {
-    padding: 8px;
-    margin-top: 10px;
-    width: 60px;
-}
-
-form {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-input[type=text], input[type=email], input[type=tel] {
-    width: 100%;
-    margin: 8px 0;
-}
-
-button {
-    background: #ff3c6f;
-    color: white;
-    padding: 10px;
-    border: none;
-    width: 100%;
-    border-radius: 8px;
-    cursor: pointer;
-}
-</style>
-
-</head>
-<body>
-
-<header>
-    <!-- ✅ LOGO -->
-    <img src="logo.png" class="logo">
-
-    <h1>GlowBite</h1>
-    <p>Student Food Co.</p>
-</header>
-
-<div class="container">
-
-<h2>Produkty</h2>
-
-<div class="products" id="products"></div>
-
-<form onsubmit="odeslat(event)">
-<h2>Objednávka</h2>
-
-<input type="text" id="name" placeholder="Jméno" required>
-<input type="text" id="surname" placeholder="Příjmení" required>
-<input type="email" id="email" placeholder="Email" required>
-<input type="tel" id="phone" placeholder="Telefon" required>
-
-<p>Kusů: <span id="kusy">0</span></p>
-<p>Cena: <span id="cena">0</span> Kč</p>
-
-<button>ODESLAT OBJEDNÁVKU</button>
-
-</form>
-
-</div>
-
-<script>
-let produkty = [
-    {nazev:"Glow Burger", cena:120, kusy:0},
-    {nazev:"Fresh Bowl", cena:95, kusy:0},
-    {nazev:"Protein tyčinka", cena:60, kusy:0},
-    {nazev:"Smoothie", cena:75, kusy:0},
-    {nazev:"Wrap", cena:85, kusy:0}
-];
-
-function zobraz(){
-    let html = "";
-    produkty.forEach(p => {
-        html += `
-        <div class="product">
-            <h3>${p.nazev}</h3>
-            <p>${p.cena} Kč</p>
-            <input type="number" value="0" min="0"
-            onchange="zmen('${p.nazev}', this.value)">
-        </div>
-        `;
-    });
-    document.getElementById("products").innerHTML = html;
-}
-
-function zmen(nazev, value){
-    let p = produkty.find(x => x.nazev === nazev);
-    p.kusy = Number(value);
-
-    let ks = 0;
-    let cena = 0;
-
-    produkty.forEach(x=>{
-        ks += x.kusy;
-        cena += x.kusy * x.cena;
-    });
-
-    document.getElementById("kusy").innerText = ks;
-    document.getElementById("cena").innerText = cena;
-}
-
 function odeslat(e){
     e.preventDefault();
 
     let text = "";
+
     produkty.forEach(x=>{
         if(x.kusy > 0){
-            text += x.nazev + " (" + x.kusy + " ks)%0D%0A";
+            text += x.nazev + " (" + x.kusy + " ks)\n";
         }
     });
 
@@ -162,17 +15,18 @@ function odeslat(e){
     const telefon = document.getElementById("phone").value;
     const cena = document.getElementById("cena").innerText;
 
-    window.location.href =
-`mailto:app@kostka-skola.cz?subject=Objednávka GlowBite&body=
-Jméno: ${jmeno} ${prijmeni}%0D%0A
-Email: ${email}%0D%0A
-Telefon: ${telefon}%0D%0A%0D%0A
-Objednávka:%0D%0A${text}%0D%0A
+    let zprava =
+`Jméno: ${jmeno} ${prijmeni}
+Email: ${email}
+Telefon: ${telefon}
+
+Objednávka:
+${text}
+
 Celková cena: ${cena} Kč`;
+
+    let encoded = encodeURIComponent(zprava);
+
+    window.location.href =
+    `mailto:app@kostka-skola.cz?subject=Objednávka GlowBite&body=${encoded}`;
 }
-
-zobraz();
-</script>
-
-</body>
-</html>
